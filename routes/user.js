@@ -1,9 +1,11 @@
 const express = require("express");
-const { getUserById, getAllUsers } = require("../controllers/user");
+const { getUser } = require("../controllers/user");
 const { checkUserExist } = require("../middlewares/database/dbHelper");
+const { userQuery } = require("../middlewares/query/userQuery");
+const User = require("../models/User");
 const router = express.Router();
 
-router.get("/:id", checkUserExist, getUserById);
-router.get("/", getAllUsers);
+router.get("/:id", checkUserExist, userQuery(User), getUser);
+router.get("/", checkUserExist, userQuery(User), getUser);
 
 module.exports = router;
