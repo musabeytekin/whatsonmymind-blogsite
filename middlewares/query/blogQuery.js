@@ -1,5 +1,10 @@
 const errorWrapper = require("../../helpers/errors/errorWrapper");
-const { search, populate, sort } = require("../../helpers/query/queryHelper");
+const {
+  search,
+  populate,
+  sort,
+  paginate,
+} = require("../../helpers/query/queryHelper");
 
 const blogQuery = (model, options) => {
   return errorWrapper(async (req, res, next) => {
@@ -7,7 +12,7 @@ const blogQuery = (model, options) => {
     if (req.params.id) query = model.findById(req.params.id);
 
     if (!req.params.id) {
-      query = search("title", query, req);
+      query = search("title", query, req)
       query = sort(query, req);
     }
     // query = await search("title", query, req);
@@ -17,12 +22,20 @@ const blogQuery = (model, options) => {
 
     // console.log(query);
 
+    let pagination;
+
+    const paginationResult = await paginate(model, query, req);
+
+
+    query = paginationResult.query;
+    pagination = paginationResult.pagination
     const result = await query;
 
     res.result = {
       success: true,
       count: result.length,
-      data: result,
+      pagination: pagination,
+      data: result
     };
 
     return next();

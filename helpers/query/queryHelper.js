@@ -20,8 +20,48 @@ const sort = (query, req) => {
   return query.sort(`-createdAt`);
 };
 
+const getPaginatorVariables = async (req, total) => {
+  let page = req.query.page || 1;
+  let limit = req.query.limit || 5;
+
+  const start = (page - 1) * limit;
+  const end = page * limit;
+
+  const pagination = {};
+
+  if (start > 0) {
+    pagination.prev = {
+      page: page - 1,
+      limit,
+    };
+  }
+  if (end < total) {
+    pagination.next = {
+      page: page + 1,
+      limit,
+    };
+  }
+  return {
+    pagination,
+    start,
+    limit,
+  };
+};
+
+const paginate = async (model, query, req) => {
+  const total = model.countDocuments();
+
+  const { pagination, start, limit } = await getPaginatorVariables(req, total);
+
+  return {
+    query: query.skip(start).limit(limit),
+    pagination: Object.keys(pagination).length === 0 ? undefined : pagination,
+  };
+};
+
 module.exports = {
   search,
   populate,
   sort,
+  paginate
 };
