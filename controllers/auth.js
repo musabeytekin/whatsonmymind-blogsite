@@ -9,16 +9,14 @@ const CustomError = require("../helpers/errors/CustomError");
 const photoUpload = require("../helpers/libraries/multer");
 const resetPasswordEmailTemplate = require("../helpers/libraries/templates/resetPasswordEmail");
 const sendMail = require("../helpers/libraries/mailSender");
-const { findById } = require("../models/User");
 
 const register = errorWrapper(async (req, res, next) => {
-  const { name, email, password, role } = req.body;
+  const { name, email, password} = req.body;
 
   const user = await User.create({
     name,
     email,
-    password,
-    role,
+    password
   });
 
   sendToken(user, res, 200);
